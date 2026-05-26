@@ -1,6 +1,7 @@
 require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
+
 const authRoutes = require("./routes/authRoutes");
 const productRoutes = require("./routes/productRoutes");
 const videoRoutes = require("./routes/videoRoutes");
@@ -16,7 +17,12 @@ connectDB();
 
 app.use(
   cors({
-    origin: "http://localhost:3000",
+    origin: [
+      "http://localhost:3000",
+      "http://localhost:5173",
+      "https://hakeem-ismail.com",
+      "https://www.hakeem-ismail.com",
+    ],
     credentials: true,
   })
 );
