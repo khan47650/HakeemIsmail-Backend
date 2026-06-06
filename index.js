@@ -8,6 +8,7 @@ const videoRoutes = require("./routes/videoRoutes");
 const shortRoutes = require("./routes/shortRoutes");
 const articleRoutes = require("./routes/articleRoutes");
 const contactMessageRoutes = require("./routes/contactMessageRoutes");
+const reviewRoutes = require("./routes/reviewRoutes");
 
 const app = express();
 
@@ -36,6 +37,7 @@ app.use("/api/videos", videoRoutes);
 app.use("/api/shorts", shortRoutes);
 app.use("/api/articles", articleRoutes);
 app.use("/api/contact-messages", contactMessageRoutes);
+app.use("/api/reviews", reviewRoutes);
 
 const PORT = process.env.PORT || 5000;
 
