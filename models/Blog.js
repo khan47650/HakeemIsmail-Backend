@@ -17,6 +17,16 @@ const blogSchema = new mongoose.Schema(
             type: String,
             required: [true, "Blog image is required"],
         },
+        midImages: {
+            type: [String],
+            default: [],
+            validate: [arr => arr.length <= 2, "Maximum 2 mid images allowed"],
+        },
+        endImages: {
+            type: [String],
+            default: [],
+            validate: [arr => arr.length <= 2, "Maximum 2 end images allowed"],
+        },
         excerpt: {
             type: String,
             default: "",

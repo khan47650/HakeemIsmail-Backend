@@ -65,6 +65,25 @@ const validateBlogData = (data, { isCreate } = {}) => {
     return errors;
 };
 
+// Upload multiple base64 images to Cloudinary
+const uploadMultipleImages = async (images = [], folder = "blogs") => {
+    const urls = [];
+    for (const img of images) {
+        if (!img) continue;
+        if (img.startsWith("data:image")) {
+            const uploaded = await cloudinary.uploader.upload(img, {
+                folder,
+                quality: "auto",
+                fetch_format: "auto",
+            });
+            urls.push(uploaded.secure_url);
+        } else if (img.startsWith("http")) {
+            urls.push(img); // already a URL (edit case)
+        }
+    }
+    return urls;
+};
+
 // GET ALL BLOGS
 exports.getAllBlogs = async (req, res) => {
     try {
@@ -154,6 +173,11 @@ exports.createBlog = async (req, res) => {
         slug = await generateUniqueBlog(slug);
 
         // Create blog
+
+        const midImagesRaw = Array.isArray(req.body.midImages) ? req.body.midImages : [];
+        const endImagesRaw = Array.isArray(req.body.endImages) ? req.body.endImages : [];
+        const midImageUrls = await uploadMultipleImages(midImagesRaw.slice(0, 2));
+        const endImageUrls = await uploadMultipleImages(endImagesRaw.slice(0, 2));
         const newBlog = new Blog({
             title,
             slug,
@@ -165,6 +189,8 @@ exports.createBlog = async (req, res) => {
             metaTitle: metaTitle || "",
             metaDescription: metaDescription || "",
             status: status || "draft",
+            midImages: midImageUrls,
+            endImages: endImageUrls,
         });
 
         const savedBlog = await newBlog.save();
@@ -228,6 +254,11 @@ exports.updateBlog = async (req, res) => {
             blog.slug = newSlug;
         }
 
+        // Handle mid/end images (merge existing URLs + new base64 uploads)
+        const midImagesRaw = Array.isArray(req.body.midImages) ? req.body.midImages : [];
+        const endImagesRaw = Array.isArray(req.body.endImages) ? req.body.endImages : [];
+        const midImageUrls = await uploadMultipleImages(midImagesRaw.slice(0, 2));
+        const endImageUrls = await uploadMultipleImages(endImagesRaw.slice(0, 2));
         // Update fields
         if (title) blog.title = title;
         blog.image = imageUrl;
@@ -238,6 +269,9 @@ exports.updateBlog = async (req, res) => {
         if (metaTitle !== undefined) blog.metaTitle = metaTitle;
         if (metaDescription !== undefined) blog.metaDescription = metaDescription;
         if (status) blog.status = status;
+        // Only overwrite if admin sent new data (empty array = clear; undefined = keep existing)
+        if (req.body.midImages !== undefined) blog.midImages = midImageUrls;
+        if (req.body.endImages !== undefined) blog.endImages = endImageUrls;
 
         const updatedBlog = await blog.save();
         res.status(200).json(updatedBlog);
