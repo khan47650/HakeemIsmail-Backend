@@ -11,6 +11,7 @@ const contactMessageRoutes = require("./routes/contactMessageRoutes");
 const reviewRoutes = require("./routes/reviewRoutes");
 const blogRoutes = require("./routes/blogRoutes.js");
 const categoryRoutes = require("./routes/categoryRoutes.js");
+const sliderImageRoutes = require("./routes/sliderImageRoutes");
 
 const app = express();
 
@@ -42,6 +43,7 @@ app.use("/api/contact-messages", contactMessageRoutes);
 app.use("/api/reviews", reviewRoutes);
 app.use("/api/blogs", blogRoutes);
 app.use('/api/categories', categoryRoutes);
+app.use("/api/slider-images", sliderImageRoutes);
 
 
 const PORT = process.env.PORT || 5000;
