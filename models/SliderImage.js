@@ -21,6 +21,11 @@ const sliderImageSchema = new mongoose.Schema(
             type: Number,
             default: 0,
         },
+
+        isMobile: {
+            type: Boolean,
+            default: false,
+        },
     },
     {
         timestamps: true,

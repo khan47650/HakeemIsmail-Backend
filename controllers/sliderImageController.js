@@ -9,11 +9,11 @@ const uploadBufferToCloudinary = (fileBuffer) => {
                 resource_type: "image",
                 transformation: [
                     {
-                        width: 1920,
-                        height: 1080,
+                        // Crop limit aur fetch_format rakha gaya hai
                         crop: "limit",
                         quality: "auto",
                         fetch_format: "auto",
+                        // Height/Width nikal di hain taa ke aspect ratio kharab na ho, chahay desktop image ho ya mobile
                     },
                 ],
             },
@@ -22,7 +22,6 @@ const uploadBufferToCloudinary = (fileBuffer) => {
                     reject(error);
                     return;
                 }
-
                 resolve(result);
             }
         );
@@ -41,7 +40,6 @@ exports.getSliderImages = async (req, res) => {
         res.status(200).json(images);
     } catch (error) {
         console.error("Get slider images error:", error);
-
         res.status(500).json({
             message: "Slider images fetch nahi ho sakin",
         });
@@ -71,11 +69,15 @@ exports.uploadSliderImage = async (req, res) => {
             .sort({ order: -1 })
             .select("order");
 
+        // Frontend se aane wali value ko boolean mein convert karke check karein
+        const isMobileImage = req.body.isMobile === 'true' || req.body.isMobile === true;
+
         const newImage = await SliderImage.create({
             imageUrl: cloudinaryResult.secure_url,
             publicId: cloudinaryResult.public_id,
             originalName: req.file.originalname,
             order: lastImage ? lastImage.order + 1 : 0,
+            isMobile: isMobileImage, // DB mein save karein
         });
 
         res.status(201).json({
@@ -84,7 +86,6 @@ exports.uploadSliderImage = async (req, res) => {
         });
     } catch (error) {
         console.error("Upload slider image error:", error);
-
         res.status(500).json({
             message: "Slider image upload nahi ho saki",
         });
