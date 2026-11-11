@@ -112,6 +112,7 @@ exports.createProduct = async (req, res) => {
       name,
       price,
       description,
+      isEnglishDescription,
       category,
       slug,
       tags,
@@ -137,6 +138,7 @@ exports.createProduct = async (req, res) => {
       slug: finalSlug,
       price,
       description,
+      isEnglishDescription: isEnglishDescription || false, 
       tags: parseTags(tags),
       category: category === "popular" ? "popular" : "nonpopular",
       metaTitle,
@@ -168,6 +170,7 @@ exports.updateProduct = async (req, res) => {
       name,
       price,
       description,
+      isEnglishDescription,
       category,
       slug,
       tags,
@@ -187,6 +190,10 @@ exports.updateProduct = async (req, res) => {
     existing.price = price;
     existing.description = description;
     existing.category = category === "popular" ? "popular" : "nonpopular";
+
+    if (isEnglishDescription !== undefined) {
+      existing.isEnglishDescription = isEnglishDescription;
+    }
 
     if (tags !== undefined) existing.tags = parseTags(tags);
     if (metaTitle !== undefined) existing.metaTitle = metaTitle;

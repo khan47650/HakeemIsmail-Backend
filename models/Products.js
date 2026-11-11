@@ -8,6 +8,7 @@ const productSchema = new mongoose.Schema(
 
     price: { type: Number, required: true },
     description: { type: String, required: true },
+    isEnglishDescription: { type: Boolean, default: false },
     tags: [String],
 
     category: {
