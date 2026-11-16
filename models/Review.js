@@ -7,19 +7,13 @@ const reviewSchema = new mongoose.Schema(
             ref: "Product",
             required: true,
         },
-        userId: {
+        image: {
             type: String,
             required: true,
         },
-        userName: {
+        imagePublicId: {
             type: String,
-            required: true,
-            trim: true,
-        },
-        review: {
-            type: String,
-            required: true,
-            trim: true,
+            default: "",
         },
     },
     { timestamps: true }
