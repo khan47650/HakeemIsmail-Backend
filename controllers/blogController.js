@@ -7,7 +7,7 @@ const slugify = (text = "") =>
         .toString()
         .toLowerCase()
         .trim()
-        .replace(/[^\w\s-]/g, "")
+        .replace(/[^\w\s\u0600-\u06FF-]/g, "")
         .replace(/[\s_-]+/g, "-")
         .replace(/^-+|-+$/g, "");
 
@@ -129,6 +129,7 @@ exports.createBlog = async (req, res) => {
     try {
         const {
             title,
+            slug: rawSlug,
             image,
             content,
             excerpt,
@@ -169,7 +170,7 @@ exports.createBlog = async (req, res) => {
         }
 
         // Generate unique slug
-        let slug = slugifyBlog(title) || `blog-${Date.now()}`;
+        let slug = slugifyBlog(rawSlug || title) || `blog-${Date.now()}`;
         slug = await generateUniqueBlog(slug);
 
         // Create blog
@@ -208,6 +209,7 @@ exports.updateBlog = async (req, res) => {
         const { id } = req.params;
         const {
             title,
+            slug,
             image,
             content,
             excerpt,
@@ -248,10 +250,16 @@ exports.updateBlog = async (req, res) => {
         }
 
         // Update slug if title changed
-        if (title && title !== blog.title) {
-            let newSlug = slugifyBlog(title);
-            newSlug = await generateUniqueBlog(newSlug, id);
-            blog.slug = newSlug;
+        if (slug !== undefined && slug.trim() !== "") {
+            const cleanedSlug = slugifyBlog(slug);
+            if (cleanedSlug && cleanedSlug !== blog.slug) {
+                blog.slug = await generateUniqueBlog(cleanedSlug, id);
+            }
+        } else if (title && title !== blog.title) {
+            const newSlug = slugifyBlog(title);
+            if (newSlug) {
+                blog.slug = await generateUniqueBlog(newSlug, id);
+            }
         }
 
         // Handle mid/end images (merge existing URLs + new base64 uploads)
